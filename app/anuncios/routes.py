@@ -31,7 +31,7 @@ def upload_imagem(current_user):
 
     # Retorna URL completa para o front
     img_url = url_for('static', filename=f'uploads/{unique_name}', _external=True)
-    return jsonify({'imagem_url': img_url}), 200
+    return jsonify({'image_url': img_url}), 200
 
 # Lista todos os anúncios
 @anuncios_bp.route('/anuncios', methods=['GET'])

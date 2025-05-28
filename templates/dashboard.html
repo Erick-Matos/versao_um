@@ -4,68 +4,42 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Dashboard – Adote um amigo!</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}" />
 </head>
 <body>
   <header class="dashboard-header">
-    <button onclick="localStorage.clear(); location.href='/'">Sair</button>
-    <h1>Encontre seu pet!</h1>
+    <h1>Meus Anúncios</h1>
     <button class="btn-anuncio">Criar anúncio</button>
   </header>
 
-  <!-- Lista de pets -->
-  <section class="pet-lista" id="petList"></section>
+  <div class="pet-lista" id="petList">
+    <!-- Cards de anúncios serão inseridos aqui via JS -->
+  </div>
 
-  <!-- Modal do formulário -->
-  <div id="petFormModal" class="modal">
-    <div class="modal-overlay"></div>
+  <!-- Modal para formulário de anúncio -->
+  <div id="petFormModal">
+    <div class="modal-overlay" id="closeModal"></div>
     <div class="modal-content">
-      <button class="close-btn" id="closeModal">&times;</button>
+      <button class="close-btn" id="closeModal">×</button>
+      <h2 id="formTitle">Novo Anúncio</h2>
       <form id="petForm">
-        <!-- Campos ocultos para edição -->
-        <input type="hidden" name="anuncioId" id="anuncioId" />
-        <input type="hidden" name="existingImageUrl" id="existingImageUrl" />
-
-        <label>
-          Nome:
-          <input type="text" name="titulo" placeholder="Nome do animal" required />
-        </label>
-
-        <label>
-          Descrição:
-          <textarea name="descricao" placeholder="Descrição do pet"></textarea>
-        </label>
-
-        <label>
-          Idade:
-          <input type="number" name="idade" placeholder="Idade" required />
-        </label>
-
-        <label>
-          Sexo:
-          <select name="sexo" required>
-            <option value="">Selecione o sexo</option>
-            <option value="Macho">Macho</option>
-            <option value="Fêmea">Fêmea</option>
-          </select>
-        </label>
-
-        <label>
-          Telefone (WhatsApp):
-          <input type="text" name="telefone" placeholder="(99) 99999-9999" required />
-        </label>
-
-        <label>
-          Imagem:
-          <input type="file" name="imagem" id="imagem" accept="image/*" />
-        </label>
-
-        <button type="submit">Salvar anúncio</button>
+        <input type="hidden" name="anuncioId" />
+        <input type="hidden" name="existingImageUrl" />
+        <input type="text" name="titulo" placeholder="Nome do Pet" required />
+        <textarea name="descricao" placeholder="Descrição do pet"></textarea>
+        <input type="number" name="idade" placeholder="Idade" required />
+        <select name="sexo" required>
+          <option value="" disabled selected>Sexo</option>
+          <option value="Macho">Macho</option>
+          <option value="Fêmea">Fêmea</option>
+        </select>
+        <input type="text" name="telefone" placeholder="Telefone (WhatsApp)" required />
+        <input type="file" name="imagem" accept="image/*" />
+        <button type="submit">Salvar</button>
       </form>
     </div>
   </div>
 
-  <!-- Seu script deve vir ao final do body -->
   <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
 </body>
 </html>
