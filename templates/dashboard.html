@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard – Adote um amigo!</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+</head>
+<body>
+  <header class="dashboard-header">
+    <button onclick="localStorage.clear(); location.href='/'">Sair</button>
+    <h1>Encontre seu pet!</h1>
+    <button class="btn-anuncio">Criar anúncio</button>
+  </header>
+
+  <!-- Lista de pets -->
+  <section class="pet-lista" id="petList"></section>
+
+  <!-- Modal do formulário -->
+  <div id="petFormModal" class="modal">
+    <div class="modal-overlay"></div>
+    <div class="modal-content">
+      <button class="close-btn" id="closeModal">&times;</button>
+      <form id="petForm">
+        <!-- Campos ocultos para edição -->
+        <input type="hidden" name="anuncioId" id="anuncioId" />
+        <input type="hidden" name="existingImageUrl" id="existingImageUrl" />
+
+        <label>
+          Nome:
+          <input type="text" name="titulo" placeholder="Nome do animal" required />
+        </label>
+
+        <label>
+          Descrição:
+          <textarea name="descricao" placeholder="Descrição do pet"></textarea>
+        </label>
+
+        <label>
+          Idade:
+          <input type="number" name="idade" placeholder="Idade" required />
+        </label>
+
+        <label>
+          Sexo:
+          <select name="sexo" required>
+            <option value="">Selecione o sexo</option>
+            <option value="Macho">Macho</option>
+            <option value="Fêmea">Fêmea</option>
+          </select>
+        </label>
+
+        <label>
+          Telefone (WhatsApp):
+          <input type="text" name="telefone" placeholder="(99) 99999-9999" required />
+        </label>
+
+        <label>
+          Imagem:
+          <input type="file" name="imagem" id="imagem" accept="image/*" />
+        </label>
+
+        <button type="submit">Salvar anúncio</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Seu script deve vir ao final do body -->
+  <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+</body>
+</html>
