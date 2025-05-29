@@ -23,7 +23,7 @@ body {
   padding: 20px;
 }
 
-/* Header e botão */
+/* Header */
 .dashboard-header {
   display: flex;
   justify-content: space-between;
@@ -81,8 +81,6 @@ body {
   color: var(--cor-primaria);
   margin-left: 10px;
 }
-
-/* Actions (WhatsApp/Editar/Excluir) */
 .pet-info .actions {
   margin-top: 8px;
   display: flex;
@@ -136,7 +134,7 @@ body {
   position: relative;
 }
 
-/* Botão de fechar (X) */
+/* Botão fechar */
 .close-btn {
   position: absolute;
   top: 10px; right: 10px;
@@ -150,7 +148,7 @@ body {
   color: #555;
 }
 
-/* Formulário dentro do modal */
+/* Formulário */
 #petForm {
   display: flex;
   flex-direction: column;
@@ -175,7 +173,7 @@ body {
   font-size: 16px;
 }
 
-/* Campos de telefone (código + número) */
+/* Campos de telefone */
 .telefone-group {
   display: flex;
   gap: 10px;
@@ -188,8 +186,6 @@ body {
   border-radius: 4px;
   font-size: 16px;
 }
-
-/* Erro de validação de telefone */
 .erro-telefone {
   display: none;
   color: red;
