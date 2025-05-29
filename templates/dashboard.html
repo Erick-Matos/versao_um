@@ -33,7 +33,13 @@
           <option value="Macho">Macho</option>
           <option value="Fêmea">Fêmea</option>
         </select>
-        <input type="text" name="telefone" placeholder="Telefone (WhatsApp)" required />
+
+        <!-- Campo de telefone com dica visual de formato -->
+        <div class="telefone-wrapper">
+          <input type="text" name="telefone" id="telefoneInput" placeholder="+55 DDD + número" required />
+          <small id="erroTelefone" class="erro-telefone">Formato inválido. Use algo como: +5511999999999</small>
+        </div>
+
         <input type="file" name="imagem" accept="image/*" />
         <button type="submit">Salvar</button>
       </form>

@@ -14,23 +14,27 @@ document.addEventListener('DOMContentLoaded', () => {
     'Content-Type':  'application/json'
   };
 
-  // ——— Elementos do DOM ———
-  const btnCriar     = document.querySelector('.btn-anuncio');
-  const modal        = document.getElementById('petFormModal');
-  const closeModal   = document.getElementById('closeModal');
-  const petForm      = document.getElementById('petForm');
-  const listContainer= document.getElementById('petList');
+  const btnCriar      = document.querySelector('.btn-anuncio');
+  const modal         = document.getElementById('petFormModal');
+  const closeModal    = document.getElementById('closeModal');
+  const petForm       = document.getElementById('petForm');
+  const listContainer = document.getElementById('petList');
+  const telefoneInput = document.getElementById('telefoneInput');
+  const erroTelefone  = document.getElementById('erroTelefone');
 
-  // abrir/criar e fechar modal via classe "active"
-  btnCriar?.addEventListener('click',   () => modal.classList.add('active'));
+  // Mostrar modal
+  btnCriar?.addEventListener('click', () => modal.classList.add('active'));
+
+  // Fechar modal
   closeModal?.addEventListener('click', () => {
     petForm.reset();
+    erroTelefone.style.display = 'none';
     petForm.anuncioId.value        = '';
     petForm.existingImageUrl.value = '';
     modal.classList.remove('active');
   });
 
-  // ——— Carrega e renderiza anúncios ———
+  // Listar anúncios
   async function loadAnuncios() {
     try {
       const res = await fetch(`${baseUrl}/anuncios`, { headers: jsonHeaders });
@@ -39,7 +43,6 @@ document.addEventListener('DOMContentLoaded', () => {
       window._anuncios = anuncios;
       renderAnuncios(anuncios);
     } catch (err) {
-      console.error(err);
       alert(err.message);
     }
   }
@@ -47,7 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function renderAnuncios(anuncios) {
     listContainer.innerHTML = '';
     anuncios.forEach(a => {
-      const imgSrc = a.imagem || '/static/img/placeholder.png';  // ajuste de fallback
+      const imgSrc = a.imagem || '/static/img/placeholder.png';
       const card = document.createElement('div');
       card.className = 'pet-card';
       card.innerHTML = `
@@ -68,7 +71,6 @@ document.addEventListener('DOMContentLoaded', () => {
       listContainer.appendChild(card);
     });
 
-    // bind Excluir
     document.querySelectorAll('.btn-excluir').forEach(btn => {
       btn.addEventListener('click', async () => {
         if (!confirm('Excluir anúncio?')) return;
@@ -76,30 +78,29 @@ document.addEventListener('DOMContentLoaded', () => {
           method: 'DELETE',
           headers: { 'Authorization': `Bearer ${token}` }
         });
-        if (!res.ok) alert(`Erro ${res.status} ao excluir`);
-        else loadAnuncios();
+        if (res.ok) loadAnuncios();
+        else alert(`Erro ${res.status} ao excluir`);
       });
     });
 
-    // bind Editar (agora abre o modal)
     document.querySelectorAll('.btn-editar').forEach(btn => {
       btn.addEventListener('click', () => {
         const anuncio = window._anuncios.find(a => a.id == btn.dataset.id);
         if (!anuncio) return alert('Anúncio não encontrado');
-        // preencher form
-        petForm.titulo.value              = anuncio.titulo;
-        petForm.descricao.value           = anuncio.descricao || '';
-        petForm.idade.value               = anuncio.idade;
-        petForm.sexo.value                = anuncio.sexo;
-        petForm.telefone.value            = anuncio.telefone.replace(/^\+55/, '');
-        petForm.existingImageUrl.value    = anuncio.imagem || '';
-        petForm.anuncioId.value           = anuncio.id;
+        petForm.titulo.value           = anuncio.titulo;
+        petForm.descricao.value        = anuncio.descricao || '';
+        petForm.idade.value            = anuncio.idade;
+        petForm.sexo.value             = anuncio.sexo;
+        petForm.telefone.value         = anuncio.telefone;
+        petForm.existingImageUrl.value = anuncio.imagem || '';
+        petForm.anuncioId.value        = anuncio.id;
+        erroTelefone.style.display     = 'none';
         modal.classList.add('active');
       });
     });
   }
 
-  // ——— Faz upload de imagem ———
+  // Upload de imagem
   async function uploadImagem(file) {
     const fd = new FormData();
     fd.append('imagem', file);
@@ -113,26 +114,40 @@ document.addEventListener('DOMContentLoaded', () => {
       throw new Error(err.error || `Falha no upload (${res.status})`);
     }
     const data = await res.json();
-    return data.image_url;  // ajustado para a chave que o backend retorna
+    return data.image_url;
   }
 
-  // ——— Criação e Atualização de Anúncio ———
+  // Validação ao digitar telefone
+  if (telefoneInput) {
+    telefoneInput.addEventListener('input', () => {
+      const telefone = telefoneInput.value.trim();
+      const telefoneValido = /^\+\d{10,15}$/.test(telefone);
+      erroTelefone.style.display = telefoneValido || telefone.length === 0 ? 'none' : 'block';
+    });
+  }
+
+  // Enviar formulário
   petForm.addEventListener('submit', async e => {
     e.preventDefault();
 
-    const idToEdit = petForm.anuncioId.value;
     const nome     = petForm.titulo.value.trim();
     const descricao= petForm.descricao.value.trim();
     const idade    = petForm.idade.value.trim();
-    const telefone = petForm.telefone.value.trim();
+    const telefone = telefoneInput.value.trim();
     const sexo     = petForm.sexo.value;
+    const idToEdit = petForm.anuncioId.value;
     let   imgUrl   = petForm.existingImageUrl.value || '';
+
+    const telefoneValido = /^\+\d{10,15}$/.test(telefone);
+    if (!telefoneValido) {
+      erroTelefone.style.display = 'block';
+      return alert("Formato de telefone inválido. Ex: +5511999999999");
+    }
 
     if (!nome || !idade || !telefone || !sexo) {
       return alert('Preencha todos os campos!');
     }
 
-    // se trocar imagem
     const fileInput = petForm.imagem;
     if (fileInput && fileInput.files.length) {
       try {
@@ -151,9 +166,7 @@ document.addEventListener('DOMContentLoaded', () => {
       imagem_url: imgUrl
     };
 
-    const url    = idToEdit
-      ? `${baseUrl}/anuncios/${idToEdit}`
-      : `${baseUrl}/anuncios`;
+    const url    = idToEdit ? `${baseUrl}/anuncios/${idToEdit}` : `${baseUrl}/anuncios`;
     const method = idToEdit ? 'PUT' : 'POST';
 
     try {
@@ -164,18 +177,16 @@ document.addEventListener('DOMContentLoaded', () => {
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.message || `Erro ${res.status}`);
-
-      // fechar modal e recarregar
       petForm.reset();
       petForm.anuncioId.value        = '';
       petForm.existingImageUrl.value = '';
       modal.classList.remove('active');
+      erroTelefone.style.display     = 'none';
       loadAnuncios();
     } catch (err) {
       alert(err.message);
     }
   });
 
-  // inicializa
   loadAnuncios();
 });

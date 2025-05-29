@@ -198,3 +198,13 @@ body {
 .btn-whatsapp:hover {
   background-color: #ddd;
 }
+
+.telefone-wrapper {
+  position: relative;
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+#telefone::placeholder {
+  color: #aaa;
+}
