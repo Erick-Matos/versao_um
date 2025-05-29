@@ -55,7 +55,11 @@ body {
     text-decoration: none;
     margin: 15px 0 10px;
 }
-
+.container button.hidden:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    border-color: var(--cor-branco);
+    color: var(--cor-branco);
+}
 .container button {
     background-color: var(--cor-primaria);
     color: var(--cor-branco);
