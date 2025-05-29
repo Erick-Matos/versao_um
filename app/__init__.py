@@ -33,7 +33,7 @@ def create_app():
     from app.auth.routes import auth_bp
     from app.anuncios.routes import anuncios_bp
     app.register_blueprint(auth_bp)
-    app.register_blueprint(anuncios_bp, url_prefix='/api')
+    app.register_blueprint(anuncios_bp)
 
     # Cria tabelas e admin
     with app.app_context():

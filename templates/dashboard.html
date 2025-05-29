@@ -12,16 +12,19 @@
     <button class="btn-anuncio">Criar anúncio</button>
   </header>
 
-  <div class="pet-lista" id="petList"></div>
+  <div class="pet-lista" id="petList">
+    <!-- Cards de anúncios serão inseridos aqui via JS -->
+  </div>
 
-  <div id="petFormModal" class="modal">
+  <!-- Modal para formulário de anúncio -->
+  <div id="petFormModal">
+    <div class="modal-overlay" id="closeModal"></div>
     <div class="modal-content">
       <button class="close-btn" id="closeModal">×</button>
       <h2 id="formTitle">Novo Anúncio</h2>
       <form id="petForm">
         <input type="hidden" name="anuncioId" />
         <input type="hidden" name="existingImageUrl" />
-
         <input type="text" name="titulo" placeholder="Nome do Pet" required />
         <textarea name="descricao" placeholder="Descrição do pet"></textarea>
         <input type="number" name="idade" placeholder="Idade" required />
@@ -30,13 +33,7 @@
           <option value="Macho">Macho</option>
           <option value="Fêmea">Fêmea</option>
         </select>
-
-        <div class="telefone-group">
-          <input type="text" id="codigoPais" name="codigoPais" placeholder="Código (55)" maxlength="3" required />
-          <input type="text" id="telefoneNumero" name="telefoneNumero" placeholder="Número" required />
-        </div>
-        <small id="erroTelefone" class="erro-telefone">Formato inválido. Use: 55 11999999999</small>
-
+        <input type="text" name="telefone" placeholder="Telefone (WhatsApp)" required />
         <input type="file" name="imagem" accept="image/*" />
         <button type="submit">Salvar</button>
       </form>

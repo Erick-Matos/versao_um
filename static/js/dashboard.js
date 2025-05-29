@@ -1,187 +1,181 @@
-// static/js/dashboard.js
-
 document.addEventListener('DOMContentLoaded', () => {
   const baseUrl = window.location.origin;
   const token   = localStorage.getItem('token');
-  if (!token) return window.location.href = '/';
+  const admin   = localStorage.getItem('admin') === 'true';
+  const userId  = parseInt(localStorage.getItem('userId'), 10);
 
-  const headers = {
+  if (!token) {
+    window.location.href = '/';
+    return;
+  }
+
+  const jsonHeaders = {
     'Authorization': `Bearer ${token}`,
     'Content-Type':  'application/json'
   };
 
-  const btnCriar         = document.querySelector('.btn-anuncio');
-  const modal            = document.getElementById('petFormModal');
-  const btnFechar        = document.getElementById('closeModal');
-  const petForm          = document.getElementById('petForm');
-  const list             = document.getElementById('petList');
-  const inputCode        = document.getElementById('codigoPais');
-  const inputNum         = document.getElementById('telefoneNumero');
-  const erroTel          = document.getElementById('erroTelefone');
-  const existingImageUrl = document.getElementById('existingImageUrl');
+  // ——— Elementos do DOM ———
+  const btnCriar     = document.querySelector('.btn-anuncio');
+  const modal        = document.getElementById('petFormModal');
+  const closeModal   = document.getElementById('closeModal');
+  const petForm      = document.getElementById('petForm');
+  const listContainer= document.getElementById('petList');
 
-  // Abre modal para criar anúncio
-  btnCriar.addEventListener('click', () => {
-    document.getElementById('formTitle').innerText = 'Novo Anúncio';
+  // abrir/criar e fechar modal via classe "active"
+  btnCriar?.addEventListener('click',   () => modal.classList.add('active'));
+  closeModal?.addEventListener('click', () => {
     petForm.reset();
-    existingImageUrl.value = '';
-    erroTel.style.display = 'none';
-    modal.classList.add('active');
-  });
-
-  // Fecha modal
-  btnFechar.addEventListener('click', closeModal);
-  window.addEventListener('click', e => {
-    if (e.target === modal) closeModal();
-  });
-  function closeModal() {
+    petForm.anuncioId.value        = '';
+    petForm.existingImageUrl.value = '';
     modal.classList.remove('active');
-    petForm.reset();
-    existingImageUrl.value = '';
-    erroTel.style.display = 'none';
-  }
+  });
 
-  // Carrega todos os anúncios
-  async function load() {
-    const res = await fetch(`${baseUrl}/api/anuncios`, { headers });
-    if (!res.ok) {
-      alert(`Erro ao carregar anúncios: ${res.status}`);
-      return;
+  // ——— Carrega e renderiza anúncios ———
+  async function loadAnuncios() {
+    try {
+      const res = await fetch(`${baseUrl}/anuncios`, { headers: jsonHeaders });
+      if (!res.ok) throw new Error(`Erro ${res.status} ao carregar anúncios`);
+      const anuncios = await res.json();
+      window._anuncios = anuncios;
+      renderAnuncios(anuncios);
+    } catch (err) {
+      console.error(err);
+      alert(err.message);
     }
-    const ads = await res.json();
-    list.innerHTML = '';
-    ads.forEach(renderCard);
   }
 
-  // Renderiza cada card de anúncio
-  function renderCard(a) {
-    const code   = (a.phoneCountry || '').replace(/\D/g, '');
-    const num    = (a.phoneNumber  || '').replace(/\D/g, '');
-    const full   = `+${code}${num}`;
-    const imgUrl = a.imagem
-      // a.imagem já vem como URL completa (_external via url_for)
-      ? a.imagem
-      : '/static/img/placeholder.png';
-
-    const card = document.createElement('div');
-    card.className = 'pet-card';
-    card.innerHTML = `
-      <img src="${imgUrl}" alt="${a.titulo}" />
-      <div class="pet-info">
-        <h2>${a.titulo}</h2>
-        <span>Idade: ${a.idade} | Sexo: <span class="sexo">${a.sexo}</span></span><br/>
-        <span>Telefone: ${full}</span>
-        <div class="actions">
-          <button class="btn-whatsapp">WhatsApp</button>
-          <button class="btn-editar"  data-id="${a.id}">Editar</button>
-          <button class="btn-excluir" data-id="${a.id}">Excluir</button>
+  function renderAnuncios(anuncios) {
+    listContainer.innerHTML = '';
+    anuncios.forEach(a => {
+      const imgSrc = a.imagem || '/static/img/placeholder.png';  // ajuste de fallback
+      const card = document.createElement('div');
+      card.className = 'pet-card';
+      card.innerHTML = `
+        <img src="${imgSrc}" alt="${a.titulo}" />
+        <div class="pet-info">
+          <h2>${a.titulo}</h2>
+          <span>Idade: ${a.idade} | Sexo: <span class="sexo">${a.sexo}</span></span><br/>
+          <span>Telefone: ${a.telefone}</span>
+          <div class="actions">
+            <a href="https://wa.me/${a.telefone.replace(/\D/g, '')}" target="_blank" class="btn-whatsapp">WhatsApp</a>
+            ${(admin || a.usuario_id === userId) ? `
+              <button class="btn-editar" data-id="${a.id}">Editar</button>
+              <button class="btn-excluir" data-id="${a.id}">Excluir</button>
+            ` : ''}
+          </div>
         </div>
-      </div>
-    `;
-    list.append(card);
+      `;
+      listContainer.appendChild(card);
+    });
 
-    // Ações dos botões
-    card.querySelector('.btn-whatsapp').onclick = () => {
-      window.open(`https://wa.me/${code}${num}`, '_blank');
-    };
-    card.querySelector('.btn-excluir').onclick = async () => {
-      if (!confirm('Excluir anúncio?')) return;
-      const r = await fetch(`${baseUrl}/api/anuncios/${a.id}`, {
-        method: 'DELETE',
-        headers
+    // bind Excluir
+    document.querySelectorAll('.btn-excluir').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        if (!confirm('Excluir anúncio?')) return;
+        const res = await fetch(`${baseUrl}/anuncios/${btn.dataset.id}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (!res.ok) alert(`Erro ${res.status} ao excluir`);
+        else loadAnuncios();
       });
-      if (r.ok) load();
-      else alert(`Erro ao excluir: ${r.status}`);
-    };
-    card.querySelector('.btn-editar').onclick = () => {
-      document.getElementById('formTitle').innerText = 'Editar Anúncio';
-      petForm.anuncioId.value        = a.id;
-      petForm.titulo.value           = a.titulo;
-      petForm.descricao.value        = a.descricao;
-      petForm.idade.value            = a.idade;
-      petForm.sexo.value             = a.sexo;
-      inputCode.value                = code;
-      inputNum.value                 = num;
-      existingImageUrl.value         = a.imagem || '';
-      erroTel.style.display          = 'none';
-      modal.classList.add('active');
-    };
+    });
+
+    // bind Editar (agora abre o modal)
+    document.querySelectorAll('.btn-editar').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const anuncio = window._anuncios.find(a => a.id == btn.dataset.id);
+        if (!anuncio) return alert('Anúncio não encontrado');
+        // preencher form
+        petForm.titulo.value              = anuncio.titulo;
+        petForm.descricao.value           = anuncio.descricao || '';
+        petForm.idade.value               = anuncio.idade;
+        petForm.sexo.value                = anuncio.sexo;
+        petForm.telefone.value            = anuncio.telefone.replace(/^\+55/, '');
+        petForm.existingImageUrl.value    = anuncio.imagem || '';
+        petForm.anuncioId.value           = anuncio.id;
+        modal.classList.add('active');
+      });
+    });
   }
 
-  // Permite apenas dígitos nos inputs de telefone
-  [inputCode, inputNum].forEach(i =>
-    i.addEventListener('input', () => {
-      i.value = i.value.replace(/\D/g, '');
-      erroTel.style.display = 'none';
-    })
-  );
+  // ——— Faz upload de imagem ———
+  async function uploadImagem(file) {
+    const fd = new FormData();
+    fd.append('imagem', file);
+    const res = await fetch(`${baseUrl}/upload-imagem`, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${token}` },
+      body: fd
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || `Falha no upload (${res.status})`);
+    }
+    const data = await res.json();
+    return data.image_url;  // ajustado para a chave que o backend retorna
+  }
 
-  // Submissão do formulário (criação/edição)
+  // ——— Criação e Atualização de Anúncio ———
   petForm.addEventListener('submit', async e => {
     e.preventDefault();
 
-    const id     = petForm.anuncioId.value;
-    const titulo = petForm.titulo.value.trim();
-    const desc   = petForm.descricao.value.trim();
-    const idade  = petForm.idade.value.trim();
-    const sexo   = petForm.sexo.value;
-    const code   = inputCode.value.trim().replace(/\D/g, '');
-    const num    = inputNum.value.trim().replace(/\D/g, '');
+    const idToEdit = petForm.anuncioId.value;
+    const nome     = petForm.titulo.value.trim();
+    const descricao= petForm.descricao.value.trim();
+    const idade    = petForm.idade.value.trim();
+    const telefone = petForm.telefone.value.trim();
+    const sexo     = petForm.sexo.value;
+    let   imgUrl   = petForm.existingImageUrl.value || '';
 
-    if (!/^\d{1,3}$/.test(code) || !/^\d{8,}$/.test(num)) {
-      erroTel.textContent = 'Código ou número inválido';
-      erroTel.style.display = 'block';
-      return;
+    if (!nome || !idade || !telefone || !sexo) {
+      return alert('Preencha todos os campos!');
     }
 
-    // Upload de imagem, se houver
-    let imageUrl = existingImageUrl.value || '';
-    const fileInput = petForm.querySelector('input[type="file"]');
+    // se trocar imagem
+    const fileInput = petForm.imagem;
     if (fileInput && fileInput.files.length) {
-      const formData = new FormData();
-      formData.append('imagem', fileInput.files[0]);
-      const up = await fetch(`${baseUrl}/api/upload-imagem`, {
-        method: 'POST',
-        headers: { 'Authorization': `Bearer ${token}` },
-        body: formData
-      });
-      if (!up.ok) {
-        alert(`Erro no upload: ${up.status}`);
-        return;
+      try {
+        imgUrl = await uploadImagem(fileInput.files[0]);
+      } catch (err) {
+        return alert(err.message);
       }
-      const { image_url } = await up.json();
-      imageUrl = image_url;
     }
 
     const payload = {
-      titulo,
-      descricao:     desc,
-      idade:         parseInt(idade, 10),
-      sexo,
-      phoneCountry:  code,
-      phoneNumber:   num,
-      imagem_url:    imageUrl
+      titulo:     nome,
+      descricao:  descricao,
+      idade:      parseInt(idade, 10),
+      sexo:       sexo,
+      telefone:   telefone,
+      imagem_url: imgUrl
     };
 
-    const url    = id
-      ? `${baseUrl}/api/anuncios/${id}`
-      : `${baseUrl}/api/anuncios`;
-    const method = id ? 'PUT' : 'POST';
+    const url    = idToEdit
+      ? `${baseUrl}/anuncios/${idToEdit}`
+      : `${baseUrl}/anuncios`;
+    const method = idToEdit ? 'PUT' : 'POST';
 
-    const res = await fetch(url, {
-      method,
-      headers,
-      body: JSON.stringify(payload)
-    });
-    if (!res.ok) {
-      alert(`Erro ao salvar anúncio: ${res.status}`);
-      return;
+    try {
+      const res = await fetch(url, {
+        method,
+        headers: jsonHeaders,
+        body:    JSON.stringify(payload)
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.message || `Erro ${res.status}`);
+
+      // fechar modal e recarregar
+      petForm.reset();
+      petForm.anuncioId.value        = '';
+      petForm.existingImageUrl.value = '';
+      modal.classList.remove('active');
+      loadAnuncios();
+    } catch (err) {
+      alert(err.message);
     }
-
-    closeModal();
-    load();
   });
 
-  // Carrega anúncios na inicialização
-  load();
+  // inicializa
+  loadAnuncios();
 });

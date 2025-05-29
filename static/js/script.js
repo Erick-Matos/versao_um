@@ -1,14 +1,13 @@
 document.addEventListener('DOMContentLoaded', () => {
   const baseUrl = window.location.origin;
   const container = document.getElementById('container');
-  const btnSignUp = document.getElementById('signUp');
-  const btnSignIn = document.getElementById('signIn');
+  const loginToggleBtn = document.getElementById('login');
+  const registerToggleBtn = document.getElementById('register');
   const loginForm = document.getElementById('loginForm');
   const signUpForm = document.getElementById('signUpForm');
 
-  // Troca entre login e cadastro usando os botões grandes da lateral
-  if (btnSignUp) btnSignUp.addEventListener('click', () => container.classList.add("active"));
-  if (btnSignIn) btnSignIn.addEventListener('click', () => container.classList.remove("active"));
+  if (loginToggleBtn) loginToggleBtn.addEventListener('click', () => container.classList.remove("active"));
+  if (registerToggleBtn) registerToggleBtn.addEventListener('click', () => container.classList.add("active"));
 
   if (signUpForm) {
     signUpForm.addEventListener('submit', async e => {
