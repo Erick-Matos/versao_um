@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap'); 
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap');
 
 :root {
   --cor-primaria: #fe6a6e;
@@ -8,6 +8,7 @@
   --cor-texto: #333;
 }
 
+/* Reset e fonte */
 * {
   margin: 0;
   padding: 0;
@@ -20,18 +21,13 @@ body {
   padding: 20px;
 }
 
+/* Header e botão */
 .dashboard-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 30px;
 }
-
-.dashboard-header h1 {
-  font-size: 22px;
-  color: var(--cor-texto);
-}
-
 .btn-anuncio {
   background-color: var(--cor-primaria);
   color: var(--cor-branco);
@@ -42,178 +38,109 @@ body {
   font-weight: 600;
 }
 
+/* Lista de cards */
 .pet-lista {
   display: flex;
   flex-direction: column;
   gap: 20px;
 }
-
 .pet-card {
   background-color: #ffe5e5;
   border-radius: 16px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
   padding: 16px;
   display: flex;
   align-items: center;
   gap: 16px;
 }
-
 .pet-card img {
   width: 80px;
   height: 80px;
   border-radius: 12px;
   object-fit: cover;
 }
-
 .pet-info h2 {
   font-size: 18px;
   margin-bottom: 4px;
 }
-
 .pet-info span {
   font-size: 14px;
   color: #555;
 }
-
 .sexo {
   font-weight: bold;
   color: var(--cor-primaria);
   margin-left: 10px;
 }
 
-/* Estilização do modal */
-#petFormModal {
+/* Estilos do modal */
+.modal {
+  display: none;
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  display: none; /* Oculto por padrão */
+  z-index: 1000;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.5);
   align-items: center;
   justify-content: center;
-  z-index: 1000;
 }
-
-#petFormModal.active {
+.modal.active {
   display: flex;
 }
-
-#petFormModal .modal-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-}
-
-#petFormModal .modal-content {
-  position: relative;
+.modal-content {
   background: var(--cor-branco);
   padding: 2rem;
   border-radius: 8px;
   width: 90%;
   max-width: 400px;
-  z-index: 1001;
+  position: relative;
 }
 
-#petFormModal .close-btn {
+/* Botão fechar */
+.close-btn {
   position: absolute;
-  top: 10px;
-  right: 10px;
+  top: 10px; right: 10px;
   background: transparent;
   border: none;
   font-size: 24px;
   color: var(--cor-primaria);
   cursor: pointer;
 }
+.close-btn:hover {
+  color: #555;
+}
 
-/* Estilo para o formulário */
+/* Formulário */
 #petForm {
   display: flex;
   flex-direction: column;
+  gap: 0.5rem;
 }
-
 #petForm input,
-#petForm select {
+#petForm select,
+#petForm textarea {
   width: 100%;
   padding: 12px;
-  margin-bottom: 1rem;
   border: 1px solid var(--cor-cinza-claro);
   border-radius: 4px;
   font-size: 16px;
 }
-
 #petForm button {
   padding: 12px;
-  font-size: 16px;
-  background-color: var(--cor-primaria);
+  background: var(--cor-primaria);
   color: var(--cor-branco);
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  font-size: 16px;
 }
 
-/* Botões de ação (editar, excluir e WhatsApp) */
-.btn-editar, .btn-excluir, .btn-whatsapp {
-  border: none;
-  padding: 5px 10px;
-  border-radius: 5px;
-  cursor: pointer;
-  font-weight: 500;
-  font-size: 12px;
-  margin-top: 15px;
-  transition: background-color 0.3s ease;
-  opacity: 0.8;
-}
-
-/* Botões de editar e excluir */
-.btn-editar {
-  background-color: #f0f0f0;
-  color: #333;
-}
-
-.btn-editar:hover {
-  background-color: #ddd;
-}
-
-.btn-excluir {
-  background-color: #f0f0f0;
-  color: #333;
-  margin-left: 8px;
-}
-
-.btn-excluir:hover {
-  background-color: #ddd;
-}
-
-/* Botão WhatsApp igual aos demais, posicionado ao lado */
-.btn-whatsapp {
-  background-color: #f0f0f0;
-  color: #333;
-  margin-left: 8px;
-}
-
-.btn-whatsapp:hover {
-  background-color: #ddd;
-}
-
-.telefone-wrapper {
-  position: relative;
-  width: 100%;
-  margin-bottom: 1rem;
-}
-
-#telefone::placeholder {
-  color: #aaa;
-}
+/* Campos de telefone */
 .telefone-group {
   display: flex;
   gap: 10px;
-  margin-bottom: 1rem;
+  margin-bottom: 0.5rem;
 }
-
 .telefone-group input {
   flex: 1;
   padding: 12px;
@@ -221,47 +148,24 @@ body {
   border-radius: 4px;
   font-size: 16px;
 }
-
 .erro-telefone {
   display: none;
   color: red;
   font-size: 12px;
-  margin-top: -10px;
-  margin-bottom: 10px;
-}
-/* Estilos para o modal */
-.modal {
-  display: none; /* Oculto por padrão */
-  position: fixed;
-  z-index: 999;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  overflow: auto; /* Rolagem caso o conteúdo seja grande */
-  background-color: rgba(0, 0, 0, 0.5); /* Fundo semitransparente */
+  margin-bottom: 1rem;
 }
 
-.modal-content {
-  background-color: #fff;
-  margin: 10% auto;
-  padding: 20px;
+/* Ações nos cards */
+.btn-whatsapp,
+.btn-editar,
+.btn-excluir {
+  border: none;
+  padding: 5px 10px;
   border-radius: 5px;
-  width: 50%;
-  position: relative;
-}
-
-/* Botão de fechar (X) no topo do modal */
-#closeModal {
-  position: absolute;
-  top: 10px;
-  right: 15px;
-  font-size: 28px;
-  font-weight: bold;
-  color: #000;
   cursor: pointer;
+  font-size: 12px;
+  margin-right: 5px;
 }
-
-#closeModal:hover {
-  color: #555;
-}
+.btn-whatsapp { background: #25D366; color: white; }
+.btn-editar { background: #f0f0f0; }
+.btn-excluir { background: #f0f0f0; }
