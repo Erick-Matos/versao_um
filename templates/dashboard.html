@@ -2,47 +2,54 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Dashboard – Adote um amigo!</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard</title>
+  <link rel="stylesheet" href="dashboard.css" />
+  <!-- (Incluir aqui outros CSS/Bootstrap se houver) -->
 </head>
 <body>
-  <header class="dashboard-header">
-    <h1>Meus Anúncios</h1>
-    <button class="btn-anuncio">Criar anúncio</button>
-  </header>
-
-  <div class="pet-lista" id="petList"></div>
-
-  <div id="petFormModal">
-    <div class="modal-overlay" id="closeModal"></div>
+  <!-- Conteúdo do dashboard (ex: navbar, etc.) -->
+  
+  <!-- Botão para abrir o modal de adicionar contato -->
+  <button id="openModal">Adicionar Contato</button>
+  
+  <!-- Tabela de contatos -->
+  <table id="contactsTable">
+    <thead>
+      <tr>
+        <th>Nome</th>
+        <th>Telefone</th>
+        <th>Ações</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Linhas de contatos serão inseridas aqui -->
+    </tbody>
+  </table>
+  
+  <!-- Modal de Adicionar Contato -->
+  <div id="addModal" class="modal">
     <div class="modal-content">
-      <button class="close-btn" id="closeModal">×</button>
-      <h2 id="formTitle">Novo Anúncio</h2>
-      <form id="petForm">
-        <input type="hidden" name="anuncioId" />
-        <input type="hidden" name="existingImageUrl" />
-        <input type="text" name="titulo" placeholder="Nome do Pet" required />
-        <textarea name="descricao" placeholder="Descrição do pet"></textarea>
-        <input type="number" name="idade" placeholder="Idade" required />
-        <select name="sexo" required>
-          <option value="" disabled selected>Sexo</option>
-          <option value="Macho">Macho</option>
-          <option value="Fêmea">Fêmea</option>
-        </select>
+      <!-- Botão "X" para fechar o modal -->
+      <span id="closeModal">&times;</span>
+      <h2>Novo Contato</h2>
+      <form id="addContactForm">
+        <label for="name">Nome:</label>
+        <input type="text" id="name" name="name" required />
 
-        <div class="telefone-group">
-          <input type="text" id="codigoPais" name="codigoPais" placeholder="Código (+55)" maxlength="4" required />
-          <input type="text" id="telefoneNumero" name="telefoneNumero" placeholder="Número (999999999)" required />
-        </div>
-        <small id="erroTelefone" class="erro-telefone">Formato inválido. Use código + número, ex: 55 11999999999</small>
+        <label for="countryCode">Código do País:</label>
+        <!-- Campo de código do país separado do número -->
+        <input type="text" id="countryCode" name="countryCode" value="+55" required />
 
-        <input type="file" name="imagem" accept="image/*" />
-        <button type="submit">Salvar</button>
+        <label for="phoneNumber">Telefone:</label>
+        <input type="text" id="phoneNumber" name="phoneNumber" required />
+
+        <button type="submit" id="saveContact">Salvar</button>
       </form>
     </div>
   </div>
-
-  <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+  
+  <script src="dashboard.js"></script>
+  <!-- (Incluir aqui scripts JS/jQuery/Bootstrap se houver) -->
 </body>
 </html>
