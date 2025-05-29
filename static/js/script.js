@@ -1,12 +1,12 @@
 document.addEventListener('DOMContentLoaded', () => {
   const baseUrl = window.location.origin;
   const container = document.getElementById('container');
-  const loginToggleBtn = document.getElementById('login');
-  const registerToggleBtn = document.getElementById('register');
+  const btnSignIn = document.getElementById('login');
+  const btnSignUp = document.getElementById('register');
   const loginForm = document.getElementById('loginForm');
   const signUpForm = document.getElementById('signUpForm');
 
-  if (btnSignUp) btnSignUp.addEventListener('click', () => container.classList.remove("active"));
+  if (btnSignIn) btnSignUp.addEventListener('click', () => container.classList.remove("active"));
   if (btnSignUp) btnSignUp.addEventListener('click', () => container.classList.add("active"));
 
   if (signUpForm) {
