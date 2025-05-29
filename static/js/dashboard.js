@@ -44,7 +44,10 @@ document.addEventListener('DOMContentLoaded', () => {
   // Carrega todos os anúncios
   async function load() {
     const res = await fetch(`${baseUrl}/api/anuncios`, { headers });
-    if (!res.ok) return alert(`Erro ${res.status}`);
+    if (!res.ok) {
+      alert(`Erro ao carregar anúncios: ${res.status}`);
+      return;
+    }
     const ads = await res.json();
     list.innerHTML = '';
     ads.forEach(renderCard);
@@ -52,12 +55,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Renderiza cada card de anúncio
   function renderCard(a) {
-    const code   = (a.phoneCountry||'').replace(/\D/g,'');
-    const num    = (a.phoneNumber||'').replace(/\D/g,'');
+    const code   = (a.phoneCountry || '').replace(/\D/g, '');
+    const num    = (a.phoneNumber  || '').replace(/\D/g, '');
     const full   = `+${code}${num}`;
     const imgUrl = a.imagem
+      // a.imagem já vem como URL completa (_external via url_for)
       ? a.imagem
-      : '/static/img/placeholder.png';  // ajuste conforme sua estrutura
+      : '/static/img/placeholder.png';
 
     const card = document.createElement('div');
     card.className = 'pet-card';
@@ -72,8 +76,8 @@ document.addEventListener('DOMContentLoaded', () => {
           <button class="btn-editar"  data-id="${a.id}">Editar</button>
           <button class="btn-excluir" data-id="${a.id}">Excluir</button>
         </div>
-      </div>`;
-
+      </div>
+    `;
     list.append(card);
 
     // Ações dos botões
@@ -87,7 +91,7 @@ document.addEventListener('DOMContentLoaded', () => {
         headers
       });
       if (r.ok) load();
-      else alert(`Erro ${r.status}`);
+      else alert(`Erro ao excluir: ${r.status}`);
     };
     card.querySelector('.btn-editar').onclick = () => {
       document.getElementById('formTitle').innerText = 'Editar Anúncio';
@@ -107,7 +111,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Permite apenas dígitos nos inputs de telefone
   [inputCode, inputNum].forEach(i =>
     i.addEventListener('input', () => {
-      i.value = i.value.replace(/\D/g,'');
+      i.value = i.value.replace(/\D/g, '');
       erroTel.style.display = 'none';
     })
   );
@@ -116,13 +120,13 @@ document.addEventListener('DOMContentLoaded', () => {
   petForm.addEventListener('submit', async e => {
     e.preventDefault();
 
-    const id    = petForm.anuncioId.value;
+    const id     = petForm.anuncioId.value;
     const titulo = petForm.titulo.value.trim();
     const desc   = petForm.descricao.value.trim();
     const idade  = petForm.idade.value.trim();
     const sexo   = petForm.sexo.value;
-    const code   = inputCode.value.trim().replace(/\D/g,'');
-    const num    = inputNum.value.trim().replace(/\D/g,'');
+    const code   = inputCode.value.trim().replace(/\D/g, '');
+    const num    = inputNum.value.trim().replace(/\D/g, '');
 
     if (!/^\d{1,3}$/.test(code) || !/^\d{8,}$/.test(num)) {
       erroTel.textContent = 'Código ou número inválido';
@@ -130,8 +134,8 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    // Primeiro faz upload da imagem, se houver arquivo selecionado
-    let imageUrl = existingImageUrl.value;
+    // Upload de imagem, se houver
+    let imageUrl = existingImageUrl.value || '';
     const fileInput = petForm.querySelector('input[type="file"]');
     if (fileInput && fileInput.files.length) {
       const formData = new FormData();
@@ -141,7 +145,10 @@ document.addEventListener('DOMContentLoaded', () => {
         headers: { 'Authorization': `Bearer ${token}` },
         body: formData
       });
-      if (!up.ok) return alert(`Erro no upload: ${up.status}`);
+      if (!up.ok) {
+        alert(`Erro no upload: ${up.status}`);
+        return;
+      }
       const { image_url } = await up.json();
       imageUrl = image_url;
     }
@@ -149,26 +156,32 @@ document.addEventListener('DOMContentLoaded', () => {
     const payload = {
       titulo,
       descricao:     desc,
-      idade:         parseInt(idade,10),
+      idade:         parseInt(idade, 10),
       sexo,
       phoneCountry:  code,
       phoneNumber:   num,
       imagem_url:    imageUrl
     };
 
-    const url    = id ? `${baseUrl}/api/anuncios/${id}` : `${baseUrl}/api/anuncios`;
+    const url    = id
+      ? `${baseUrl}/api/anuncios/${id}`
+      : `${baseUrl}/api/anuncios`;
     const method = id ? 'PUT' : 'POST';
+
     const res = await fetch(url, {
       method,
       headers,
       body: JSON.stringify(payload)
     });
-    if (!res.ok) return alert(`Erro ${res.status}`);
+    if (!res.ok) {
+      alert(`Erro ao salvar anúncio: ${res.status}`);
+      return;
+    }
 
     closeModal();
     load();
   });
 
-  // Chama pela primeira vez
+  // Carrega anúncios na inicialização
   load();
 });
