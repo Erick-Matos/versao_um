@@ -6,8 +6,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const loginForm = document.getElementById('loginForm');
   const signUpForm = document.getElementById('signUpForm');
 
-  if (loginToggleBtn) loginToggleBtn.addEventListener('click', () => container.classList.remove("active"));
-  if (registerToggleBtn) registerToggleBtn.addEventListener('click', () => container.classList.add("active"));
+  if (btnSignUp) btnSignUp.addEventListener('click', () => container.classList.remove("active"));
+  if (btnSignUp) btnSignUp.addEventListener('click', () => container.classList.add("active"));
 
   if (signUpForm) {
     signUpForm.addEventListener('submit', async e => {
