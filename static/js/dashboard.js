@@ -1,187 +1,181 @@
-document.addEventListener('DOMContentLoaded', () => {
-  const baseUrl = window.location.origin;
-  const token   = localStorage.getItem('token');
-  const admin   = localStorage.getItem('admin') === 'true';
-  const userId  = parseInt(localStorage.getItem('userId'), 10);
+let adsData = [];
 
-  if (!token) {
-    window.location.href = '/';
-    return;
+// Adiciona uma nova linha na tabela para um anúncio
+function addAdToTable(ad) {
+  // Garantir que não haja duplicação de código de país no número
+  let country = ad.phoneCountry ? ad.phoneCountry.toString().replace(/\D/g, '') : '';
+  let number  = ad.phoneNumber ? ad.phoneNumber.toString().replace(/\D/g, '') : '';
+  // Monta a linha da tabela com os dados do anúncio
+  const tr = document.createElement('tr');
+  tr.innerHTML = `
+    <td>${ad.titulo}</td>
+    <td>${ad.descricao}</td>
+    <td>+${country}${number}</td>
+    <td>
+      <a href="https://wa.me/${country}${number}" target="_blank">WhatsApp</a>
+      <button class="btnEdit"
+              data-id="${ad.id}"
+              data-titulo="${ad.titulo}"
+              data-descricao="${ad.descricao}"
+              data-phone-country="${country}"
+              data-phone-number="${number}">
+        Editar
+      </button>
+    </td>
+  `;
+  document.querySelector('#adsTable tbody').appendChild(tr);
+}
+
+// Abre o modal preenchendo os campos para editar um anúncio existente
+function openModalForEdit(ad) {
+  document.getElementById('adId').value = ad.id;
+  document.getElementById('titulo').value = ad.titulo;
+  document.getElementById('descricao').value = ad.descricao;
+  document.getElementById('phoneCountry').value = ad.phoneCountry || '';
+  document.getElementById('phoneNumber').value = ad.phoneNumber || '';
+  document.getElementById('modalTitle').innerText = 'Editar Anúncio';
+  document.getElementById('adModal').classList.add('show');  // exibe o modal
+}
+
+// Abre o modal com campos vazios para cadastrar um novo anúncio
+function openModalForNew() {
+  document.getElementById('adForm').reset();  // limpa todos os campos do formulário
+  document.getElementById('adId').value = '';
+  // Opcional: definir um código de país padrão, por exemplo '55'
+  // document.getElementById('phoneCountry').value = '55';
+  document.getElementById('modalTitle').innerText = 'Novo Anúncio';
+  document.getElementById('adModal').classList.add('show');  // exibe o modal
+}
+
+// Fecha/oculta o modal
+function closeModal() {
+  document.getElementById('adModal').classList.remove('show');
+}
+
+// Lida com o envio do formulário para criar ou editar um anúncio
+function handleFormSubmit(event) {
+  event.preventDefault();
+  // Obtém valores dos campos do formulário
+  const id         = document.getElementById('adId').value;
+  const titulo     = document.getElementById('titulo').value.trim();
+  const descricao  = document.getElementById('descricao').value.trim();
+  let phoneCountry = document.getElementById('phoneCountry').value.trim();
+  let phoneNumber  = document.getElementById('phoneNumber').value.trim();
+  if (!titulo || !descricao || !phoneCountry || !phoneNumber) {
+    return;  // validação básica (campos obrigatórios)
   }
-
-  const jsonHeaders = {
-    'Authorization': `Bearer ${token}`,
-    'Content-Type':  'application/json'
+  // Remove qualquer caractere não numérico (como '+' ou espaços) dos campos de telefone
+  phoneCountry = phoneCountry.replace(/\D/g, '');
+  phoneNumber  = phoneNumber.replace(/\D/g, '');
+  // Monta o objeto com os dados do anúncio
+  const adData = {
+    titulo: titulo,
+    descricao: descricao,
+    phoneCountry: phoneCountry,
+    phoneNumber: phoneNumber
   };
 
-  // Elements
-  const btnCriar      = document.querySelector('.btn-anuncio');
-  const modal         = document.getElementById('petFormModal');
-  const closeModal    = document.getElementById('closeModal');
-  const petForm       = document.getElementById('petForm');
-  const listContainer = document.getElementById('petList');
-  const codigoInput   = document.getElementById('codigoPais');
-  const numeroInput   = document.getElementById('telefoneNumero');
-  const erroTelefone  = document.getElementById('erroTelefone');
-
-  // Open modal
-  btnCriar?.addEventListener('click', () => {
-    modal.classList.add('active');
-  });
-
-  // Close modal on X
-  closeModal?.addEventListener('click', () => {
-    modal.classList.remove('active');
-    petForm.reset();
-    erroTelefone.style.display = 'none';
-  });
-
-  // Close modal on backdrop
-  window.addEventListener('click', e => {
-    if (e.target === modal) {
-      modal.classList.remove('active');
-      petForm.reset();
-      erroTelefone.style.display = 'none';
-    }
-  });
-
-  // Load anuncios
-  async function loadAnuncios() {
-    const res = await fetch(`${baseUrl}/anuncios`, { headers: jsonHeaders });
-    if (!res.ok) return alert(`Erro ${res.status}`);
-    const anuncios = await res.json();
-    renderAnuncios(anuncios);
-  }
-
-  function renderAnuncios(anuncios) {
-    listContainer.innerHTML = '';
-    anuncios.forEach(a => {
-      const imgSrc = a.imagem || '/static/img/placeholder.png';
-      const card = document.createElement('div');
-      card.className = 'pet-card';
-      card.innerHTML = `
-        <img src="${imgSrc}" alt="${a.titulo}" />
-        <div class="pet-info">
-          <h2>${a.titulo}</h2>
-          <span>Idade: ${a.idade} | Sexo: <span class="sexo">${a.sexo}</span></span>
-          <p>Telefone: ${a.telefone}</p>
-          <div class="actions">
-            <button class="btn-whatsapp" onclick="window.open('https://wa.me/${a.telefone.replace(/\D/g, '')}','_blank')">WhatsApp</button>
-            ${ (admin || a.usuario_id===userId)
-               ? `<button class="btn-editar" data-id="${a.id}">Editar</button>
-                  <button class="btn-excluir" data-id="${a.id}">Excluir</button>`
-               : ''
-            }
-          </div>
-        </div>`;
-      listContainer.appendChild(card);
+  if (id) {
+    // Atualização de anúncio existente (edição)
+    adData.id = id;
+    fetch(`/api/anuncios/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(adData)
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Erro ao atualizar anúncio');
+      }
+      // Atualiza os dados locais (adsData) com as novas informações
+      const index = adsData.findIndex(item => item.id == id);
+      if (index !== -1) {
+        adsData[index] = adData;
+      }
+      // Atualiza a linha correspondente na tabela (evitando duplicar código do país)
+      const editBtn = document.querySelector(`button[data-id="${id}"]`);
+      if (editBtn) {
+        editBtn.dataset.titulo = titulo;
+        editBtn.dataset.descricao = descricao;
+        editBtn.dataset.phoneCountry = phoneCountry;
+        editBtn.dataset.phoneNumber = phoneNumber;
+        const row = editBtn.closest('tr');
+        if (row) {
+          row.children[0].textContent = titulo;
+          row.children[1].textContent = descricao;
+          row.children[2].textContent = `+${phoneCountry}${phoneNumber}`;
+          const waLink = row.querySelector('a[href^="https://wa.me/"]');
+          if (waLink) {
+            waLink.href = `https://wa.me/${phoneCountry}${phoneNumber}`;
+          }
+        }
+      }
+      closeModal();  // fecha o modal após atualizar
+    })
+    .catch(error => {
+      console.error(error);
+      alert(error.message);
     });
-
-    // Excluir
-    document.querySelectorAll('.btn-excluir').forEach(btn => {
-      btn.addEventListener('click', async () => {
-        if (!confirm('Excluir anúncio?')) return;
-        const res = await fetch(`${baseUrl}/anuncios/${btn.dataset.id}`, {
-          method: 'DELETE',
-          headers: {'Authorization': `Bearer ${token}`}
-        });
-        if (res.ok) loadAnuncios();
-        else alert(`Erro ${res.status}`);
-      });
-    });
-
-    // Editar
-    document.querySelectorAll('.btn-editar').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const a = window._anuncios.find(x => x.id == btn.dataset.id);
-        if (!a) return alert('Não encontrado');
-        petForm.titulo.value = a.titulo;
-        petForm.descricao.value = a.descricao || '';
-        petForm.idade.value = a.idade;
-        petForm.sexo.value = a.sexo;
-        // split code + number
-        const m = a.telefone.match(/^\+(\d{1,4})(\d{8,13})$/);
-        if (m) { codigoInput.value = m[1]; numeroInput.value = m[2]; }
-        else { codigoInput.value = '55'; numeroInput.value = a.telefone.replace(/\D/g,''); }
-        petForm.existingImageUrl.value = a.imagem || '';
-        petForm.anuncioId.value = a.id;
-        erroTelefone.style.display = 'none';
-        modal.classList.add('active');
-      });
-    });
-  }
-
-  // Image upload helper
-  async function uploadImagem(file) {
-    const fd = new FormData();
-    fd.append('imagem', file);
-    const res = await fetch(`${baseUrl}/upload-imagem`, {
+  } else {
+    // Criação de um novo anúncio
+    fetch('/api/anuncios', {
       method: 'POST',
-      headers: {'Authorization': `Bearer ${token}`},
-      body: fd
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(adData)
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Erro ao criar anúncio');
+      }
+      return response.json();
+    })
+    .then(newAd => {
+      // Insere o novo anúncio na lista local e na tabela
+      adsData.push(newAd);
+      addAdToTable(newAd);
+      closeModal();  // fecha o modal após cadastrar
+    })
+    .catch(error => {
+      console.error(error);
+      alert(error.message);
     });
-    if (!res.ok) {
-      const err = await res.json().catch(()=>{});
-      throw new Error(err.error||`Erro ${res.status}`);
-    }
-    return (await res.json()).image_url;
   }
+}
 
-  // Only digits for code/number
-  [codigoInput, numeroInput].forEach(inp => {
-    inp.addEventListener('input', () => {
-      inp.value = inp.value.replace(/\D/g,'');
-      erroTelefone.style.display = 'none';
-    });
-  });
+// Configura os event listeners após carregar o DOM
+document.addEventListener('DOMContentLoaded', function() {
+  // Carrega os anúncios existentes (supondo que exista uma API para listar anúncios)
+  fetch('/api/anuncios')
+    .then(response => response.json())
+    .then(data => {
+      adsData = data;
+      data.forEach(ad => addAdToTable(ad));
+    })
+    .catch(err => console.error('Erro ao carregar anúncios:', err));
 
-  // Submit form
-  petForm.addEventListener('submit', async e => {
-    e.preventDefault();
-    const nome      = petForm.titulo.value.trim();
-    const descricao = petForm.descricao.value.trim();
-    const idade     = petForm.idade.value.trim();
-    const sexo      = petForm.sexo.value;
-    const idToEdit  = petForm.anuncioId.value;
-    let imgUrl      = petForm.existingImageUrl.value || '';
-
-    const cod = codigoInput.value.trim();
-    const num = numeroInput.value.trim();
-    const telefone = `+${cod}${num}`;
-
-    if (!/^\+\d{10,15}$/.test(telefone)) {
-      erroTelefone.style.display = 'block';
-      return alert('Telefone inválido.');
-    }
-    if (!nome||!idade||!telefone||!sexo) {
-      return alert('Preencha todos os campos!');
-    }
-
-    const fileInput = petForm.imagem;
-    if (fileInput.files.length) {
-      try { imgUrl = await uploadImagem(fileInput.files[0]); }
-      catch(err){ return alert(err.message); }
-    }
-
-    const payload = { titulo:nome, descricao, idade:parseInt(idade,10),
-                      sexo, telefone, imagem_url:imgUrl };
-
-    const url    = idToEdit?`${baseUrl}/anuncios/${idToEdit}`:`${baseUrl}/anuncios`;
-    const method = idToEdit?'PUT':'POST';
-    try {
-      const res = await fetch(url, {
-        method, headers: jsonHeaders, body: JSON.stringify(payload)
-      });
-      if (!res.ok) throw new Error((await res.json()).message||res.status);
-      modal.classList.remove('active');
-      petForm.reset();
-      erroTelefone.style.display = 'none';
-      loadAnuncios();
-    } catch(err){
-      alert(err.message);
+  // Botão "Novo Anúncio"
+  document.getElementById('btnNewAd').addEventListener('click', openModalForNew);
+  // Botão de fechar (X) do modal
+  document.getElementById('modalClose').addEventListener('click', closeModal);
+  // Delegação de evento para botões "Editar" na tabela
+  document.querySelector('#adsTable tbody').addEventListener('click', function(e) {
+    if (e.target && e.target.classList.contains('btnEdit')) {
+      const btn = e.target;
+      const adId = btn.getAttribute('data-id');
+      // Busca os dados do anúncio (nos dados locais ou via atributos data)
+      let ad = adsData.find(item => item.id == adId);
+      if (!ad) {
+        ad = {
+          id: adId,
+          titulo: btn.getAttribute('data-titulo'),
+          descricao: btn.getAttribute('data-descricao'),
+          phoneCountry: btn.getAttribute('data-phone-country'),
+          phoneNumber: btn.getAttribute('data-phone-number')
+        };
+      }
+      openModalForEdit(ad);
     }
   });
-
-  // Inicial
-  loadAnuncios();
+  // Submissão do formulário (botão "Salvar")
+  document.getElementById('adForm').addEventListener('submit', handleFormSubmit);
 });

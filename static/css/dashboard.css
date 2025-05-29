@@ -9,7 +9,9 @@
 }
 
 /* Reset e fonte */
-* {
+*,
+*::before,
+*::after {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
@@ -27,6 +29,10 @@ body {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 30px;
+}
+.dashboard-header h1 {
+  font-size: 22px;
+  color: var(--cor-texto);
 }
 .btn-anuncio {
   background-color: var(--cor-primaria);
@@ -59,6 +65,9 @@ body {
   border-radius: 12px;
   object-fit: cover;
 }
+.pet-info {
+  flex: 1;
+}
 .pet-info h2 {
   font-size: 18px;
   margin-bottom: 4px;
@@ -73,7 +82,36 @@ body {
   margin-left: 10px;
 }
 
-/* Estilos do modal */
+/* Actions (WhatsApp/Editar/Excluir) */
+.pet-info .actions {
+  margin-top: 8px;
+  display: flex;
+  gap: 8px;
+}
+.btn-whatsapp {
+  background-color: #25D366;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 12px;
+}
+.btn-editar,
+.btn-excluir {
+  background-color: #f0f0f0;
+  color: #333;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 12px;
+}
+.btn-whatsapp:hover { background-color: #1ebe5b; }
+.btn-editar:hover,
+.btn-excluir:hover { background-color: #ddd; }
+
+/* Modal base */
 .modal {
   display: none;
   position: fixed;
@@ -87,6 +125,8 @@ body {
 .modal.active {
   display: flex;
 }
+
+/* Conteúdo do modal */
 .modal-content {
   background: var(--cor-branco);
   padding: 2rem;
@@ -96,7 +136,7 @@ body {
   position: relative;
 }
 
-/* Botão fechar */
+/* Botão de fechar (X) */
 .close-btn {
   position: absolute;
   top: 10px; right: 10px;
@@ -110,7 +150,7 @@ body {
   color: #555;
 }
 
-/* Formulário */
+/* Formulário dentro do modal */
 #petForm {
   display: flex;
   flex-direction: column;
@@ -135,7 +175,7 @@ body {
   font-size: 16px;
 }
 
-/* Campos de telefone */
+/* Campos de telefone (código + número) */
 .telefone-group {
   display: flex;
   gap: 10px;
@@ -148,24 +188,11 @@ body {
   border-radius: 4px;
   font-size: 16px;
 }
+
+/* Erro de validação de telefone */
 .erro-telefone {
   display: none;
   color: red;
   font-size: 12px;
   margin-bottom: 1rem;
 }
-
-/* Ações nos cards */
-.btn-whatsapp,
-.btn-editar,
-.btn-excluir {
-  border: none;
-  padding: 5px 10px;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 12px;
-  margin-right: 5px;
-}
-.btn-whatsapp { background: #25D366; color: white; }
-.btn-editar { background: #f0f0f0; }
-.btn-excluir { background: #f0f0f0; }

@@ -2,52 +2,62 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Dashboard – Adote um amigo!</title>
-  <!-- Certifique-se de usar este caminho exato -->
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard - Anúncios</title>
+  <link rel="stylesheet" href="dashboard.css" />
 </head>
 <body>
 
-  <header class="dashboard-header">
-    <h1>Meus Anúncios</h1>
-    <button class="btn-anuncio">Criar anúncio</button>
-  </header>
+  <h1>Gerenciamento de Anúncios</h1>
 
-  <div class="pet-lista" id="petList"></div>
+  <!-- Botão para criar novo anúncio -->
+  <button id="btnNewAd">Novo Anúncio</button>
 
-  <!-- Modal de Anúncio -->
-  <div id="petFormModal" class="modal">
+  <table id="adsTable" border="1">
+    <thead>
+      <tr>
+        <th>Título</th>
+        <th>Descrição</th>
+        <th>Telefone</th>
+        <th>Ações</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- As linhas de anúncios serão inseridas aqui via JavaScript -->
+    </tbody>
+  </table>
+
+  <!-- Modal para adicionar/editar anúncio -->
+  <div id="adModal" class="modal">
     <div class="modal-content">
-      <!-- Botão "X" para fechar -->
-      <button class="close-btn" id="closeModal">×</button>
-      <h2 id="formTitle">Novo Anúncio</h2>
-      <form id="petForm">
-        <input type="hidden" name="anuncioId" />
-        <input type="hidden" name="existingImageUrl" />
-
-        <input type="text" name="titulo" placeholder="Nome do Pet" required />
-        <textarea name="descricao" placeholder="Descrição do pet"></textarea>
-        <input type="number" name="idade" placeholder="Idade" required />
-        <select name="sexo" required>
-          <option value="" disabled selected>Sexo</option>
-          <option value="Macho">Macho</option>
-          <option value="Fêmea">Fêmea</option>
-        </select>
-
-        <!-- Campos de telefone -->
-        <div class="telefone-group">
-          <input type="text" id="codigoPais" name="codigoPais" placeholder="Código (+55)" maxlength="4" required />
-          <input type="text" id="telefoneNumero" name="telefoneNumero" placeholder="Número (999999999)" required />
-        </div>
-        <small id="erroTelefone" class="erro-telefone">Formato inválido. Ex: 55 11999999999</small>
-
-        <input type="file" name="imagem" accept="image/*" />
-        <button type="submit">Salvar</button>
-      </form>
+      <div class="modal-header">
+        <h2 id="modalTitle">Editar Anúncio</h2>
+        <span id="modalClose" class="close">&times;</span>
+      </div>
+      <div class="modal-body">
+        <form id="adForm">
+          <input type="hidden" id="adId" name="id" />
+          <div class="form-group">
+            <label for="titulo">Título:</label>
+            <input type="text" id="titulo" name="titulo" required />
+          </div>
+          <div class="form-group">
+            <label for="descricao">Descrição:</label>
+            <textarea id="descricao" name="descricao" required></textarea>
+          </div>
+          <div class="form-group">
+            <label>Telefone:</label>
+            <div>
+              <input type="tel" id="phoneCountry" name="phoneCountry" placeholder="55" pattern="[0-9]{1,3}" required />
+              <input type="tel" id="phoneNumber" name="phoneNumber" placeholder="999999999" pattern="[0-9]{8,}" required />
+            </div>
+          </div>
+          <button type="submit" id="btnSave">Salvar</button>
+        </form>
+      </div>
     </div>
   </div>
 
-  <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+  <script src="dashboard.js"></script>
 </body>
 </html>
