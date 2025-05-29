@@ -2,14 +2,11 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Dashboard – Adote um amigo!</title>
-
-  <!-- CSS agora carregado corretamente do diretório static/css -->
   <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}" />
 </head>
 <body>
-
   <header class="dashboard-header">
     <h1>Meus Anúncios</h1>
     <button class="btn-anuncio">Criar anúncio</button>
@@ -17,7 +14,6 @@
 
   <div class="pet-lista" id="petList"></div>
 
-  <!-- Modal de Anúncio -->
   <div id="petFormModal" class="modal">
     <div class="modal-content">
       <button class="close-btn" id="closeModal">×</button>
@@ -36,10 +32,10 @@
         </select>
 
         <div class="telefone-group">
-          <input type="text" id="codigoPais" name="codigoPais" placeholder="Código (+55)" maxlength="4" required />
-          <input type="text" id="telefoneNumero" name="telefoneNumero" placeholder="Número (999999999)" required />
+          <input type="text" id="codigoPais" name="codigoPais" placeholder="Código (55)" maxlength="3" required />
+          <input type="text" id="telefoneNumero" name="telefoneNumero" placeholder="Número" required />
         </div>
-        <small id="erroTelefone" class="erro-telefone">Formato inválido. Ex: 55 11999999999</small>
+        <small id="erroTelefone" class="erro-telefone">Formato inválido. Use: 55 11999999999</small>
 
         <input type="file" name="imagem" accept="image/*" />
         <button type="submit">Salvar</button>
@@ -47,7 +43,6 @@
     </div>
   </div>
 
-  <!-- JS agora carregado corretamente do diretório static/js -->
   <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
 </body>
 </html>
