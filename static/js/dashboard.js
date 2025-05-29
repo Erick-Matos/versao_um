@@ -19,13 +19,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const closeModal    = document.getElementById('closeModal');
   const petForm       = document.getElementById('petForm');
   const listContainer = document.getElementById('petList');
-  const telefoneInput = document.getElementById('telefoneInput');
+  const codigoInput   = document.getElementById('codigoPais');
+  const numeroInput   = document.getElementById('telefoneNumero');
   const erroTelefone  = document.getElementById('erroTelefone');
 
-  // Mostrar modal
   btnCriar?.addEventListener('click', () => modal.classList.add('active'));
 
-  // Fechar modal
   closeModal?.addEventListener('click', () => {
     petForm.reset();
     erroTelefone.style.display = 'none';
@@ -34,7 +33,6 @@ document.addEventListener('DOMContentLoaded', () => {
     modal.classList.remove('active');
   });
 
-  // Listar anúncios
   async function loadAnuncios() {
     try {
       const res = await fetch(`${baseUrl}/anuncios`, { headers: jsonHeaders });
@@ -87,11 +85,20 @@ document.addEventListener('DOMContentLoaded', () => {
       btn.addEventListener('click', () => {
         const anuncio = window._anuncios.find(a => a.id == btn.dataset.id);
         if (!anuncio) return alert('Anúncio não encontrado');
-        petForm.titulo.value           = anuncio.titulo;
-        petForm.descricao.value        = anuncio.descricao || '';
-        petForm.idade.value            = anuncio.idade;
-        petForm.sexo.value             = anuncio.sexo;
-        petForm.telefone.value         = anuncio.telefone;
+        petForm.titulo.value        = anuncio.titulo;
+        petForm.descricao.value     = anuncio.descricao || '';
+        petForm.idade.value         = anuncio.idade;
+        petForm.sexo.value          = anuncio.sexo;
+
+        const match = anuncio.telefone.match(/^\+(\d{1,4})(\d{8,13})$/);
+        if (match) {
+          codigoInput.value = match[1];
+          numeroInput.value = match[2];
+        } else {
+          codigoInput.value = '55';
+          numeroInput.value = anuncio.telefone.replace(/\D/g, '');
+        }
+
         petForm.existingImageUrl.value = anuncio.imagem || '';
         petForm.anuncioId.value        = anuncio.id;
         erroTelefone.style.display     = 'none';
@@ -100,7 +107,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Upload de imagem
   async function uploadImagem(file) {
     const fd = new FormData();
     fd.append('imagem', file);
@@ -117,31 +123,30 @@ document.addEventListener('DOMContentLoaded', () => {
     return data.image_url;
   }
 
-  // Validação ao digitar telefone
-  if (telefoneInput) {
-    telefoneInput.addEventListener('input', () => {
-      const telefone = telefoneInput.value.trim();
-      const telefoneValido = /^\+\d{10,15}$/.test(telefone);
-      erroTelefone.style.display = telefoneValido || telefone.length === 0 ? 'none' : 'block';
+  [codigoInput, numeroInput].forEach(input => {
+    input.addEventListener('input', () => {
+      input.value = input.value.replace(/\D/g, '');
+      erroTelefone.style.display = 'none';
     });
-  }
+  });
 
-  // Enviar formulário
   petForm.addEventListener('submit', async e => {
     e.preventDefault();
 
-    const nome     = petForm.titulo.value.trim();
-    const descricao= petForm.descricao.value.trim();
-    const idade    = petForm.idade.value.trim();
-    const telefone = telefoneInput.value.trim();
-    const sexo     = petForm.sexo.value;
-    const idToEdit = petForm.anuncioId.value;
-    let   imgUrl   = petForm.existingImageUrl.value || '';
+    const nome      = petForm.titulo.value.trim();
+    const descricao = petForm.descricao.value.trim();
+    const idade     = petForm.idade.value.trim();
+    const sexo      = petForm.sexo.value;
+    const idToEdit  = petForm.anuncioId.value;
+    let imgUrl      = petForm.existingImageUrl.value || '';
 
-    const telefoneValido = /^\+\d{10,15}$/.test(telefone);
-    if (!telefoneValido) {
+    const codPais = codigoInput.value.trim();
+    const numero  = numeroInput.value.trim();
+    const telefone = `+${codPais}${numero}`;
+
+    if (!/^\+\d{10,15}$/.test(telefone)) {
       erroTelefone.style.display = 'block';
-      return alert("Formato de telefone inválido. Ex: +5511999999999");
+      return alert("Formato de telefone inválido.");
     }
 
     if (!nome || !idade || !telefone || !sexo) {

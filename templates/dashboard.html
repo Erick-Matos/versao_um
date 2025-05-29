@@ -12,11 +12,8 @@
     <button class="btn-anuncio">Criar anúncio</button>
   </header>
 
-  <div class="pet-lista" id="petList">
-    <!-- Cards de anúncios serão inseridos aqui via JS -->
-  </div>
+  <div class="pet-lista" id="petList"></div>
 
-  <!-- Modal para formulário de anúncio -->
   <div id="petFormModal">
     <div class="modal-overlay" id="closeModal"></div>
     <div class="modal-content">
@@ -34,11 +31,11 @@
           <option value="Fêmea">Fêmea</option>
         </select>
 
-        <!-- Campo de telefone com dica visual de formato -->
-        <div class="telefone-wrapper">
-          <input type="text" name="telefone" id="telefoneInput" placeholder="+55 DDD + número" required />
-          <small id="erroTelefone" class="erro-telefone">Formato inválido. Use algo como: +5511999999999</small>
+        <div class="telefone-group">
+          <input type="text" id="codigoPais" name="codigoPais" placeholder="Código (+55)" maxlength="4" required />
+          <input type="text" id="telefoneNumero" name="telefoneNumero" placeholder="Número (999999999)" required />
         </div>
+        <small id="erroTelefone" class="erro-telefone">Formato inválido. Use código + número, ex: 55 11999999999</small>
 
         <input type="file" name="imagem" accept="image/*" />
         <button type="submit">Salvar</button>

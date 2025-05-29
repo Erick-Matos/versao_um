@@ -208,3 +208,24 @@ body {
 #telefone::placeholder {
   color: #aaa;
 }
+.telefone-group {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 1rem;
+}
+
+.telefone-group input {
+  flex: 1;
+  padding: 12px;
+  border: 1px solid var(--cor-cinza-claro);
+  border-radius: 4px;
+  font-size: 16px;
+}
+
+.erro-telefone {
+  display: none;
+  color: red;
+  font-size: 12px;
+  margin-top: -10px;
+  margin-bottom: 10px;
+}
