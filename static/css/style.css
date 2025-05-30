@@ -111,31 +111,29 @@ body {
 }
 
 /* Sign-in inicia visível */
+/* estado inicial (sem .active) */
 .sign-in {
-    left: 0;
-    width: 50%;
-    z-index: 2;
-    transform: translateX(0);
+  left: 0;
+  width: 50%;
+  z-index: 2;
+  transform: translateX(0);
 }
-
-/* Sign-up inicia fora da tela (100%) e invisível */
 .sign-up {
-    left: 0;
-    width: 50%;
-    opacity: 0;
-    z-index: 1;
-    transform: translateX(100%);
+  left: 0;
+  width: 50%;
+  opacity: 0;
+  z-index: 1;
+  transform: translateX(100%);      /* fora da tela, à direita */
 }
 
-/* Container ativo: inverte os dois */
+/* estado ativo: */
 .container.active .sign-in {
-    transform: translateX(-100%);
+  transform: translateX(100%);      /* muda login para o lado direito */
 }
 .container.active .sign-up {
-    transform: translateX(0);
-    opacity: 1;
-    z-index: 5;
-    animation: move 0.6s;
+  transform: translateX(100%);      /* mantém cadastro “no” lado direito */
+  opacity: 1;
+  z-index: 5;
 }
 
 @keyframes move {
