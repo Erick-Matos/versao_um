@@ -14,21 +14,29 @@ document.addEventListener('DOMContentLoaded', () => {
     'Content-Type':  'application/json'
   };
 
-  // ——— Elementos do DOM ———
-  const btnCriar     = document.querySelector('.btn-anuncio');
-  const modal        = document.getElementById('petFormModal');
-  const closeModal   = document.getElementById('closeModal');
-  const petForm      = document.getElementById('petForm');
-  const listContainer= document.getElementById('petList');
+const btnCriar      = document.querySelector('.btn-anuncio');
+const modal         = document.getElementById('petFormModal');
+const overlay       = modal.querySelector('.modal-overlay');  // só class, sem id
+const closeModalBtn = document.getElementById('closeModal');  // só o botão X tem esse id
+const petForm       = document.getElementById('petForm');
+const listContainer = document.getElementById('petList');
 
-  // abrir/criar e fechar modal via classe "active"
-  btnCriar?.addEventListener('click',   () => modal.classList.add('active'));
-  closeModal?.addEventListener('click', () => {
-    petForm.reset();
-    petForm.anuncioId.value        = '';
-    petForm.existingImageUrl.value = '';
-    modal.classList.remove('active');
-  });
+// função única de fechar + resetar form
+function fecharModal() {
+  petForm.reset();
+  petForm.anuncioId.value        = '';
+  petForm.existingImageUrl.value = '';
+  modal.classList.remove('active');
+}
+
+// abrir modal
+btnCriar?.addEventListener('click', () => modal.classList.add('active'));
+
+// fechar modal: tanto clicando no overlay...
+overlay?.addEventListener('click', fecharModal);
+// ...quanto clicando no X
+closeModalBtn?.addEventListener('click', fecharModal);
+
 
   // ——— Carrega e renderiza anúncios ———
   async function loadAnuncios() {
