@@ -1,18 +1,23 @@
 document.addEventListener('DOMContentLoaded', () => {
-  const baseUrl = window.location.origin;
-  const container = document.getElementById('container');
-  const btnSignIn = document.getElementById('login');
-  const btnSignUp = document.getElementById('register');
-  const loginForm = document.getElementById('loginForm');
+  const baseUrl    = window.location.origin;
+  const container  = document.getElementById('container');
+  const btnSignIn  = document.getElementById('signIn');   // botão “Entrar”
+  const btnSignUp  = document.getElementById('signUp');   // botão “Cadastre-se”
+  const loginForm  = document.getElementById('loginForm');
   const signUpForm = document.getElementById('signUpForm');
 
-  if (btnSignIn) btnSignUp.addEventListener('click', () => container.classList.remove("active"));
-  if (btnSignUp) btnSignUp.addEventListener('click', () => container.classList.add("active"));
+  // alterna entre login e cadastro
+  if (btnSignIn) btnSignIn.addEventListener('click', () => {
+    container.classList.remove("active");
+  });
+  if (btnSignUp) btnSignUp.addEventListener('click', () => {
+    container.classList.add("active");
+  });
 
+  // cadastro
   if (signUpForm) {
     signUpForm.addEventListener('submit', async e => {
       e.preventDefault();
-
       const nome     = document.getElementById('signupName').value.trim();
       const email    = document.getElementById('signupEmail').value.trim();
       const senha    = document.getElementById('signupPassword').value.trim();
@@ -35,6 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // login
   if (loginForm) {
     loginForm.addEventListener('submit', async e => {
       e.preventDefault();
