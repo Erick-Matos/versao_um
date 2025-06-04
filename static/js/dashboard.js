@@ -14,29 +14,28 @@ document.addEventListener('DOMContentLoaded', () => {
     'Content-Type':  'application/json'
   };
 
-const btnCriar      = document.querySelector('.btn-anuncio');
-const modal         = document.getElementById('petFormModal');
-const overlay       = modal.querySelector('.modal-overlay');  // só class, sem id
-const closeModalBtn = document.getElementById('closeModal');  // só o botão X tem esse id
-const petForm       = document.getElementById('petForm');
-const listContainer = document.getElementById('petList');
+  const btnCriar      = document.querySelector('.btn-anuncio');
+  const modal         = document.getElementById('petFormModal');
+  const overlay       = modal.querySelector('.modal-overlay');
+  const closeModalBtn = document.getElementById('closeModal');
+  const petForm       = document.getElementById('petForm');
+  const listContainer = document.getElementById('petList');
 
-// função única de fechar + resetar form
-function fecharModal() {
-  petForm.reset();
-  petForm.anuncioId.value        = '';
-  petForm.existingImageUrl.value = '';
-  modal.classList.remove('active');
-}
+  // função única de fechar + resetar form
+  function fecharModal() {
+    petForm.reset();
+    petForm.anuncioId.value        = '';
+    petForm.existingImageUrl.value = '';
+    modal.classList.remove('active');
+  }
 
-// abrir modal
-btnCriar?.addEventListener('click', () => modal.classList.add('active'));
+  // abrir modal
+  btnCriar?.addEventListener('click', () => modal.classList.add('active'));
 
-// fechar modal: tanto clicando no overlay...
-overlay?.addEventListener('click', fecharModal);
-// ...quanto clicando no X
-closeModalBtn?.addEventListener('click', fecharModal);
-
+  // fechar modal: tanto clicando no overlay...
+  overlay?.addEventListener('click', fecharModal);
+  // ...quanto clicando no X
+  closeModalBtn?.addEventListener('click', fecharModal);
 
   // ——— Carrega e renderiza anúncios ———
   async function loadAnuncios() {
@@ -55,7 +54,7 @@ closeModalBtn?.addEventListener('click', fecharModal);
   function renderAnuncios(anuncios) {
     listContainer.innerHTML = '';
     anuncios.forEach(a => {
-      const imgSrc = a.imagem || '/static/img/placeholder.png';  // ajuste de fallback
+      const imgSrc = a.imagem || '/static/img/placeholder.png';
       const card = document.createElement('div');
       card.className = 'pet-card';
       card.innerHTML = `
@@ -89,19 +88,30 @@ closeModalBtn?.addEventListener('click', fecharModal);
       });
     });
 
-    // bind Editar (agora abre o modal)
+    // bind Editar
     document.querySelectorAll('.btn-editar').forEach(btn => {
       btn.addEventListener('click', () => {
         const anuncio = window._anuncios.find(a => a.id == btn.dataset.id);
         if (!anuncio) return alert('Anúncio não encontrado');
         // preencher form
-        petForm.titulo.value              = anuncio.titulo;
-        petForm.descricao.value           = anuncio.descricao || '';
-        petForm.idade.value               = anuncio.idade;
-        petForm.sexo.value                = anuncio.sexo;
-        petForm.telefone.value            = anuncio.telefone.replace(/^\+55/, '');
-        petForm.existingImageUrl.value    = anuncio.imagem || '';
-        petForm.anuncioId.value           = anuncio.id;
+        petForm.titulo.value           = anuncio.titulo;
+        petForm.descricao.value        = anuncio.descricao || '';
+        petForm.idade.value            = anuncio.idade;
+        petForm.sexo.value             = anuncio.sexo;
+        petForm.existingImageUrl.value = anuncio.imagem || '';
+        petForm.anuncioId.value        = anuncio.id;
+
+        // SEPARA CÓDIGO DO PAÍS E NÚMERO
+        let cod = '55', num = '';
+        if (anuncio.telefone && anuncio.telefone.startsWith('+')) {
+          const match = anuncio.telefone.match(/^\+(\d{1,3})(\d{8,15})$/);
+          if (match) {
+            cod = match[1];
+            num = match[2];
+          }
+        }
+        petForm.codigoPais.value = cod;
+        petForm.numeroTelefone.value = num;
         modal.classList.add('active');
       });
     });
@@ -121,24 +131,33 @@ closeModalBtn?.addEventListener('click', fecharModal);
       throw new Error(err.error || `Falha no upload (${res.status})`);
     }
     const data = await res.json();
-    return data.image_url;  // ajustado para a chave que o backend retorna
+    return data.image_url;
   }
 
   // ——— Criação e Atualização de Anúncio ———
   petForm.addEventListener('submit', async e => {
     e.preventDefault();
 
-    const idToEdit = petForm.anuncioId.value;
-    const nome     = petForm.titulo.value.trim();
-    const descricao= petForm.descricao.value.trim();
-    const idade    = petForm.idade.value.trim();
-    const telefone = petForm.telefone.value.trim();
-    const sexo     = petForm.sexo.value;
-    let   imgUrl   = petForm.existingImageUrl.value || '';
+    const idToEdit    = petForm.anuncioId.value;
+    const nome        = petForm.titulo.value.trim();
+    const descricao   = petForm.descricao.value.trim();
+    const idade       = petForm.idade.value.trim();
+    const sexo        = petForm.sexo.value;
+    const codigoPais  = petForm.codigoPais.value.trim();
+    const numeroTel   = petForm.numeroTelefone.value.trim();
+    let   imgUrl      = petForm.existingImageUrl.value || '';
 
-    if (!nome || !idade || !telefone || !sexo) {
+    // Validação dos campos obrigatórios
+    if (!nome || !idade || !codigoPais || !numeroTel || !sexo) {
       return alert('Preencha todos os campos!');
     }
+    if (!/^\d+$/.test(codigoPais)) {
+      return alert('Código do país inválido! Use apenas números.');
+    }
+    if (!/^\d{8,15}$/.test(numeroTel)) {
+      return alert('Telefone inválido! Use só números, de 8 a 15 dígitos.');
+    }
+    const telefone = `+${codigoPais}${numeroTel}`;
 
     // se trocar imagem
     const fileInput = petForm.imagem;

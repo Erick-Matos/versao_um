@@ -33,7 +33,35 @@
           <option value="Macho">Macho</option>
           <option value="Fêmea">Fêmea</option>
         </select>
-        <input type="text" name="telefone" placeholder="Telefone (WhatsApp)" required />
+        <!-- TELEFONE SEPARADO -->
+        <div class="telefone-group">
+          <span class="telefone-mais">+</span>
+          <input
+            type="text"
+            id="codigoPais"
+            name="codigoPais"
+            value="55"
+            maxlength="3"
+            style="width: 55px; text-align: center;"
+            required
+            autocomplete="off"
+            pattern="\d+"
+            title="Somente números"
+          />
+          <input
+            type="text"
+            id="numeroTelefone"
+            name="numeroTelefone"
+            placeholder="79999999999"
+            maxlength="15"
+            style="flex: 1;"
+            required
+            autocomplete="off"
+            pattern="\d+"
+            title="Somente números"
+          />
+        </div>
+        <!-- -------------- -->
         <input type="file" name="imagem" accept="image/*" />
         <button type="submit">Salvar</button>
       </form>

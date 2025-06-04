@@ -198,3 +198,20 @@ body {
 .btn-whatsapp:hover {
   background-color: #ddd;
 }
+.telefone-group {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+.telefone-group input[type="text"] {
+  border: 1px solid var(--cor-cinza-claro);
+  border-radius: 4px;
+  padding: 12px;
+  font-size: 16px;
+}
+.telefone-mais {
+  font-size: 1.2em;
+  margin-right: 2px;
+  color: var(--cor-texto);
+}
