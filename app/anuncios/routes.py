@@ -69,7 +69,7 @@ def create_anuncio(current_user):
         descricao   = descricao,
         idade       = idade,
         sexo        = sexo,
-        telefone    = tel_raw and f'+55{tel_raw}',
+        telefone    = tel_raw ,
         imagem      = filename,
         usuario_id  = current_user.id
     )
@@ -93,7 +93,7 @@ def update_anuncio(current_user, id):
 
     tel_raw = data.get('telefone_responsavel') or data.get('telefone')
     if tel_raw:
-        a.telefone = f'+55{tel_raw}'
+        a.telefone = tel_raw
 
     img_url = data.get('imagem_url', '')
     if img_url:
