@@ -215,3 +215,58 @@ body {
   margin-right: 2px;
   color: var(--cor-texto);
 }
+/* Modal de descrição do pet */
+.descricao-modal {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  background: rgba(0,0,0,0.4);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+.descricao-modal.active {
+  display: flex;
+}
+.descricao-modal-content {
+  background: var(--cor-branco);
+  padding: 2rem;
+  border-radius: 8px;
+  max-width: 350px;
+  width: 90vw;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.descricao-modal-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: transparent;
+  border: none;
+  font-size: 24px;
+  color: var(--cor-primaria);
+  cursor: pointer;
+}
+#descricaoTexto {
+  font-size: 1rem;
+  color: var(--cor-texto);
+  margin-top: 16px;
+  word-break: break-word;
+  white-space: pre-line;
+}
+.descricao-icon {
+  font-size: 18px;
+  color: var(--cor-primaria);
+  vertical-align: middle;
+  margin-left: 6px;
+  cursor: pointer;
+  opacity: 0.85;
+  transition: opacity .2s;
+}
+.descricao-icon:hover {
+  opacity: 0.65;
+}
